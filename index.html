@@ -167,11 +167,15 @@
 
         let docHeight = document.documentElement.clientHeight;
         let imgs = Array.from(document.body.querySelectorAll('.lazy'));
+        let timer;
         window.addEventListener('scroll', checkLazy);
         checkLazy();
 
         function checkLazy(){
-            imgs = imgs.filter(checkInScreen);
+            clearTimeout(timer);
+            timer = setTimeout(_ => {
+                imgs = imgs.filter(checkInScreen);
+            }, 300);
         }
         function checkInScreen(el){
             let {top, bottom} = el.getBoundingClientRect();
