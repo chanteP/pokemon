@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8" />
+    <title>pokemon</title>
+    <meta content="telephone=no,email=no" name=format-detection />
+    <meta content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport" />
+    <style>
+        html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}nav ul,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}a{margin:0;padding:0;font-size:100%;vertical-align:baseline;background:transparent;cursor:pointer}ins{background-color:#ff9;color:#000;text-decoration:none}mark{background-color:#ff9;color:#000;font-style:italic;font-weight:bold}del{text-decoration:line-through}abbr[title],dfn[title]{border-bottom:1px dotted;cursor:help}table{text-align:left;border-collapse:collapse;border-spacing:0}b,i{font-weight:400;text-decoration:none}a,img{-webkit-touch-callout:none}input,select,textarea,button{outline:0}
+    </style>
+</head>
+<body>
+    <style>
+        html{
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            background: #fff;
+        }
+        #wrap{
+            font-size:12px;
+            padding-bottom: 30px;
+        }
+        .gen{
+            display: flex;
+            border-top: 4px solid #000;
+            padding-bottom: 20px;
+            color: #fff;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        @media (max-width: 450px){
+            .gen{
+            }
+        }
+        .pokemon{
+            position:relative;
+            flex: 1 0 150px;
+            padding: 0;
+            max-width: 150px;
+            cursor: pointer;
+            z-index: 1;
+        }
+        @media (max-width: 450px){
+            .pokemon{
+                flex: 1 0 120px;
+                max-width: 120px;
+                /* max-width: initial; */
+            }
+        }
+        .pokemon:hover .image{
+            transform: scale(1.3);
+            z-index: 2;
+        }
+        .info{
+            box-sizing: border-box;
+            border-bottom: 1px solid #000;
+            white-space: nowrap;
+            line-height: 1.4;
+            color: #333;
+            -webkit-user-select: auto;
+            cursor: pointer;
+        }
+        .image{
+            display:block;
+            width:100%;
+            min-height:150px;
+            transform-origin: 50%;
+            transition: all .2s ease;
+        }
+        .lazy{
+            visibility: hidden;
+            opacity: 0;
+        }
+        .loaded{
+            visibility: visible;
+            opacity: 1;
+        }
+        @media (max-width: 450px){
+            .image{
+                min-height:120px;
+            }
+        }
+        .num{
+            display: inline-block;
+            width: 3em;
+            background: #000;
+            color:#fff;
+            font-weight: 700;
+            text-align: center;
+        }
+        .name{
+            display: inline-block;
+        }
+        .subname{
+            position: absolute;
+            right: 12px;
+            bottom: -16px;
+            color: #999;
+            transform: scale(.8);
+            transform-origin: 100% 0;
+        }
+        .types{
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            white-space: nowrap;
+            line-height: 1.4;
+            transform: scale(.7);
+            transform-origin: 0% 100%;
+        }
+        .types span{
+            display: block;
+            width: 3.5em;
+            text-align: center;
+            color: #fff;
+            opacity: .7;
+            transition: all .2s ease;
+        }
+        .types span:hover{
+            opacity: 1;
+        }
+        .types span + span{
+            margin-top: 1px;
+        }
+
+        
+        span[data-type="草"]{background: rgb(146, 191, 25);}
+        span[data-type="毒"]{background: rgb(190, 120, 190);}
+        span[data-type="火"]{background: rgb(255, 55, 0);}
+        span[data-type="飛行"]{background: rgb(121, 188, 215);}
+        span[data-type="龍"]{background: rgb(60, 100, 200);}
+        span[data-type="水"]{background: rgb(0, 148, 229);}
+        span[data-type="蟲"]{background: rgb(50, 180, 50);}
+        span[data-type="一般"]{background: rgb(160, 160, 160);}
+        span[data-type="惡"]{background: rgb(100, 100, 100);}
+        span[data-type="電"]{background: rgb(228, 183, 0);}
+        span[data-type="超能力"]{background: rgb(220, 120, 200);}
+        span[data-type="地面"]{background: rgb(204, 161, 66);}
+        span[data-type="冰"]{background: rgb(0, 183, 238);}
+        span[data-type="鋼"]{background: rgb(150, 180, 220);}
+        span[data-type="妖精"]{background: rgb(255, 126, 184);}
+        span[data-type="格鬥"]{background: rgb(200, 85, 0);}
+        span[data-type="岩石"]{background: rgb(160, 120, 80);}
+        span[data-type="幽靈"]{background: rgb(140, 120, 240);}
+    </style>
+    <div id="wrap"></div>
+    <script src="./data.js"></script>
+    <script>
+        let genNums = [151,251,386,493,649,721,807];
+        let gens = pokemons.reduce((list, p) => {
+            let {num} = p;
+            let gen = getGenFromNum(num);
+            list[gen - 1] = list[gen - 1] || [];
+            list[gen - 1].push(p);
+            return list;
+        }, []);
+
+        wrap.innerHTML = gens.map((gen, i) => {
+            let borderColor = getGenColor(genNums[i]);
+            return `
+                <div class="gen" style="border-color:${borderColor};">
+                    ${gen.map(renderPokemon).join('')}
+                </div>
+            `;
+        }).join('');
+
+        let docHeight = document.documentElement.clientHeight;
+        let imgs = Array.from(document.body.querySelectorAll('.lazy'));
+        window.addEventListener('scroll', checkLazy);
+
+        function checkLazy(){
+            imgs = imgs.filter(checkInScreen);
+        }
+        function checkInScreen(el){
+            let {top, bottom} = el.getBoundingClientRect();
+            let offset = 150;
+            if(top + offset > 0 && bottom - offset < docHeight){
+                el.src = el.dataset.src;
+                el.onload = _ => {
+                    el.classList.add('loaded');
+                }
+                return false;
+            }
+            return true;
+        }
+        function renderPokemon(p){
+            let {image,num,name,subname,types,picName} = p;
+            let color = getGenColor(num);
+            let imageSrc = image || `./pics/${picName}`;
+            return `
+                <div class="pokemon">
+                    <img class="lazy image" data-src="${imageSrc}" />
+                    <div class="types">${types.map(type => {
+                        return `<span data-type="${type}">${type}</span>`;
+                    }).join('')}</div>
+                    <div class="info" style="border-color:${color}">
+                        <div class="num" style="background:${color};">#${num}</div>
+                        <div class="name">${name}</div>
+                        <div class="subname">${subname}</div>
+                    </div>
+                </div>
+            `;
+        }
+        function getGenColor(num, l = '30%'){
+            let i = getGenFromNum(num);
+            return `hsl(${i * 30 + 180}, 80%, ${l})`;
+        }
+        function getGenFromNum(num){
+            let i = 0;
+            while(+num > genNums[i++]);
+            return i;
+        }
+    </script>
+</body>
+</html>
